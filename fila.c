@@ -68,7 +68,7 @@ boolean remova_elemento_da_fila (Fila* f){
         (*f).vetor=(ElementoDeFila*)realloc((*f).vetor,((*f).capacidade/2)*sizeof(ElementoDeFila));
         }
     }  
-	
+	(*f).capacidade /= 2;
     return true;
 }
 
