@@ -47,7 +47,8 @@ boolean recupere_da_fila (Fila f, ElementoDeFila* e){
 }
 
 boolean remova_elemento_da_fila (Fila* f){
-    if ((*f).qtd_atual==0) return false;
+    /*
+        if ((*f).qtd_atual==0) return false;
 
     (*f).qtd_atual--;
     (*f).vetor[(*f).inicio] = NULL;
@@ -69,6 +70,41 @@ boolean remova_elemento_da_fila (Fila* f){
         }
     }  
 	(*f).capacidade /= 2;
+    return true;
+    */
+
+
+    
+    if (f->qtd_atual==0) return false;
+
+    f->vetor[f->inicio]=NULL;
+
+    f->inicio = f->inicio+1==f->capacidade?0:f->inicio+1;
+
+    f->qtd_atual--;
+
+    if (f->qtd_atual<=f->capacidade/4 &&
+        f->capacidade>f->capacidade_inicial)
+    {
+        unsigned int metade_capacidade = f->capacidade/2;
+        ElementoDeFila* novo = (ElementoDeFila*)malloc(metade_capacidade*sizeof(ElementoDeFila));
+        if (novo==NULL) return false;
+
+        for (int pNovo=0, pVelho=f->inicio;
+             pNovo<f->qtd_atual;
+             pNovo++, pVelho=(pVelho+1)%f->capacidade)
+        {
+            novo[pNovo]=f->vetor[pVelho];
+            f->vetor[pVelho]=NULL;
+        }
+        free(f->vetor);
+        f->vetor=novo;
+
+        f->inicio=0;
+        f->final=f->qtd_atual;
+        f->capacidade=metade_capacidade;
+    }
+
     return true;
 }
 
