@@ -3,37 +3,15 @@
 #include <ctype.h>
 #include "fila.h"
 #include "pilha.h"
+#include "funcoes.h"
+#include <math.h>
 
-unsigned int posicao(char operador)
-{
-    switch (operador)
-    {
-    case '(':
-        return 0;
-    case '^':
-        return 1;
-    case '*':
-        return 2;
-    case '/':
-        return 3;
-    case '+':
-        return 4;
-    case '-':
-        return 5;
-    case ')':
-        return 6;
-    default:
-        return 7; // invalido
-    }
-}
-
-int main()
-{
+int main(){
     /* EXMPLO DO MALIGNO
 
     Fila fil;
     nova_fila (&fil,10);
-
+    
     int*  i;
 
     i=(int*)malloc(sizeof(int));
@@ -63,13 +41,17 @@ int main()
     free_fila(&fil);
     */
 
+
+
+
+
     // DEFINIÇÃO DA EXPRESSÃO
     Fila filaDeEntrada;
     Fila filaDeSaida;
     Pilha Operadores;
-    nova_fila(&filaDeEntrada, 100);
-    nova_fila(&filaDeSaida, 100);
-    nova_pilha(&Operadores, 100);
+    nova_fila (&filaDeEntrada,100);
+    nova_fila (&filaDeSaida,100);
+    nova_pilha (&Operadores,100);
 
     char expressao[100];
     char tokens[100][20];
@@ -78,40 +60,34 @@ int main()
     printf("Digite a expressao matematica: ");
     fgets(expressao, sizeof(expressao), stdin);
 
-    for (int i = 0; (expressao[i] != '\0' && expressao[i] != '\n'); i++)
-    {
-        if (isspace(expressao[i]))
-        { // se for espaço
+    for (int i = 0; (expressao[i] != '\0' && expressao[i] != '\n'); i++){
+        if (isspace(expressao[i])) {                                        // se for espaço
             continue;
-        }
-        else if (isdigit(expressao[i]))
-        { // se for numero
+            
+        } else if (isdigit(expressao[i])) {                                 // se for numero
             int j;
-            for (j = 0; isdigit(expressao[i]); j++)
-            {
+            for (j = 0; isdigit(expressao[i]); j++){
                 tokens[contadorToken][j] = expressao[i++];
             }
             tokens[contadorToken][j] = '\0';
-            guarde_na_fila(&filaDeEntrada, (ElementoDeFila)tokens[contadorToken]);
+            guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[contadorToken]);
             contadorToken++;
             i--;
-        }
-        else
-        { // se for simbolo
+            
+        } else {                                                            // se for simbolo
             tokens[contadorToken][0] = expressao[i];
             tokens[contadorToken][1] = '\0';
-            guarde_na_fila(&filaDeEntrada, (ElementoDeFila)tokens[contadorToken]);
+            guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[contadorToken]);
             contadorToken++;
         }
     }
+
 
     // MOSTRANDO OS TOKENS
     /*char *teste1;
     //teste1=(char*)malloc(sizeof(char));
     printf("Tokens separados:\n");
     for (int i = 0; i < contadorToken; i++) {
-        //guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[i]);
-
         recupere_da_fila(filaDeEntrada,(ElementoDeFila*)&teste1);
         printf("'%s'\n", teste1);
         remova_elemento_da_fila(&filaDeEntrada);
@@ -119,102 +95,81 @@ int main()
     }
     //free(teste1);*/
 
+
+
+
+
     // TABELA DE DECISÃO
     boolean matriz[7][7] = {
         //  (      ^      *      /      +      -      )
-        {false, false, false, false, false, false, true}, // (
-        {false, false, true, true, true, true, true},     // ^
-        {false, false, true, true, true, true, true},     // *
-        {false, false, true, true, true, true, true},     // /
-        {false, false, false, false, true, true, true},   // +
-        {false, false, false, false, true, true, true},   // -
-        {false, false, false, false, false, false, false} // )
+        { false, false, false, false, false, false, true  }, // (
+        { false, false, true,  true,  true,  true,  true  }, // ^
+        { false, false, true,  true,  true,  true,  true  }, // *
+        { false, false, true,  true,  true,  true,  true  }, // /
+        { false, false, false, false, true,  true,  true  }, // +
+        { false, false, false, false, true,  true,  true  }, // -
+        { false, false, false, false, false, false, false }  // )
     };
 
-    /*char op_Topo = '(';
-    char op_Fila = ')';
 
-    printf("\nTeste da matriz: '%c' x '%c' = %d\n",
-           op_Topo, op_Fila, matriz[posicao(op_Topo)][posicao(op_Fila)]);*/
+
 
     // PROCESSAMENTO
-    char *op_Fila;
-    char *op_Topo;
-    while (!fila_vazia(filaDeEntrada))
-    {
-        //op_Fila = (char *)malloc(sizeof(char));
-        recupere_da_fila(filaDeEntrada, (ElementoDeFila *)&op_Fila);
+    char* op_Fila;
+    char* op_Topo;
+    while(!fila_vazia(filaDeEntrada)){
+        recupere_da_fila(filaDeEntrada,(ElementoDeFila*)&op_Fila);
 
-        if (isdigit(*op_Fila))
-        { 
-            guarde_na_fila(&filaDeSaida, (ElementoDeFila)op_Fila);
-        }
-        else
-        {
-            if (*op_Fila == ')' && !pilha_vazia(Operadores))
-            {
-                //op_Topo = (char *)malloc(sizeof(char));
-                recupere_da_pilha(Operadores, (ElementoDePilha *)&op_Topo);
-                while (*op_Topo != '(')
-                {
-                    guarde_na_fila(&filaDeSaida, (ElementoDeFila)op_Topo);
+        if (isdigit(*op_Fila)){                                         // se for digito, talvez *op_Fila?
+            guarde_na_fila(&filaDeSaida,(ElementoDeFila)op_Fila);
+        } else {                                                       // se for operador
+
+            if (!pilha_vazia(Operadores)  && *op_Fila == ')'){            // se for ) faz desempilhamento até (, e () são deletados
+                recupere_da_pilha(Operadores,(ElementoDePilha*)&op_Topo);
+                while(!pilha_vazia(Operadores) && *op_Topo != '('){
+                    guarde_na_fila(&filaDeSaida,(ElementoDeFila)op_Topo);
                     remova_elemento_da_pilha(&Operadores);
-                    //op_Topo = NULL;
-                    recupere_da_pilha(Operadores, (ElementoDePilha *)&op_Topo);
+                    recupere_da_pilha(Operadores,(ElementoDePilha*)&op_Topo);
                 }
+
                 remova_elemento_da_pilha(&Operadores);
                 op_Topo = NULL;
-            }
-            else
-            {
-                if (!pilha_vazia(Operadores))
-                {
-                    
-                    //op_Topo = (char *)malloc(sizeof(char));
-                    recupere_da_pilha(Operadores, (ElementoDePilha *)&op_Topo);
-
+                
+            } else {
+                if (!pilha_vazia(Operadores)){                           // se for comun, desempilha até achar F na tabela
+                    recupere_da_pilha(Operadores,(ElementoDePilha*)&op_Topo);
                     while (matriz[posicao(*op_Topo)][posicao(*op_Fila)] && !pilha_vazia(Operadores))
                     {
                         guarde_na_fila(&filaDeSaida, (ElementoDeFila)op_Topo);
                         remova_elemento_da_pilha(&Operadores);
-                        //op_Topo = NULL;
                         recupere_da_pilha(Operadores, (ElementoDePilha *)&op_Topo);
                     }
-                    op_Topo = NULL;   
+
+                    op_Topo = NULL;
                 }
-                guarde_na_pilha(&Operadores, (ElementoDePilha)op_Fila);
+                guarde_na_pilha(&Operadores,(ElementoDePilha)op_Fila);  // empilhamento
             }
-        }
+        } 
+
         remova_elemento_da_fila(&filaDeEntrada);
         op_Fila = NULL;
     }
-    
-    //free(op_Fila);
 
-    if (fila_vazia(filaDeEntrada) && !pilha_vazia(Operadores))
-    {
-        //op_Topo = (char *)malloc(sizeof(char));
-        while (!pilha_vazia(Operadores))
-        {
-            recupere_da_pilha(Operadores, (ElementoDePilha *)&op_Topo);
-            guarde_na_fila(&filaDeSaida, (ElementoDeFila)op_Topo);
+
+    if (fila_vazia(filaDeEntrada) && !pilha_vazia(Operadores)){          // desempilhamento até pilha_vazia(Operadores)
+        while (!pilha_vazia(Operadores)){
+            recupere_da_pilha(Operadores,(ElementoDePilha*)&op_Topo);
+            guarde_na_fila(&filaDeSaida,(ElementoDeFila)op_Topo);
             remova_elemento_da_pilha(&Operadores);
-            //op_Topo = NULL;
         }
     }
-    //free(op_Topo);
 
     free_fila(&filaDeEntrada);
     free_pilha(&Operadores);
 
 
 
-
-
-
     char *teste2;
-    //teste2=(char*)malloc(sizeof(char));
-
     printf("Fila de saida separados:\n");
     while (!fila_vazia(filaDeSaida)) {
         recupere_da_fila(filaDeSaida, (ElementoDeFila *)&teste2);
@@ -224,8 +179,81 @@ int main()
     }
 
 
-    //free(teste2);
 
+    /*Pilha pilhaDeResultados;
+    nova_pilha(&pilhaDeResultados, 100);
+
+    char* temp;
+    double* num1;
+    double* num2;
+    num1=(double*)malloc(sizeof(double));
+    num2=(double*)malloc(sizeof(double));
+
+    while(!fila_vazia(filaDeSaida)){
+        recupere_da_fila(filaDeSaida,(ElementoDeFila*)&temp);
+        if (isdigit(*temp)){                                         // se for digito, talvez *temp?
+            guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)temp);
+        } else {                                                       // se for operador
+            if (!pilha_vazia(pilhaDeResultados)){                       // desempilha dois numeros da pilha de resultados e faz a conta com o op recuperado
+                recupere_da_pilha(pilhaDeResultados,(ElementoDePilha*)&num1);
+                remova_elemento_da_pilha(&pilhaDeResultados);
+                recupere_da_pilha(pilhaDeResultados,(ElementoDePilha*)&num2);
+                remova_elemento_da_pilha(&pilhaDeResultados);
+
+                switch (*temp) {
+                    case '+':
+                        *temp = *num1+*num2;
+                        guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)temp);
+                        break;
+                    case '-':
+                        *temp = *num1-*num2;
+                        guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)temp);
+                        break;
+                    case '*':
+                        *temp = (*num1)*(*num2);
+                        guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)temp);
+                        break;
+                    case '/':
+                        *temp = (*num1)/(*num2);
+                        guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)temp);
+                        break;
+                    case '^': {
+                        int* e;
+                        e=(int*)malloc(sizeof(int));
+                        *e = pow(*num1, *num2);
+                        guarde_na_pilha(&pilhaDeResultados,(ElementoDePilha)e);
+                        free(e);
+                        e = NULL;
+                        break;
+                    }
+                    default:  
+                        break; //invalido
+                }
+
+                num1 = NULL;
+                num1 = NULL;
+            }
+        }
+        remova_elemento_da_fila(&filaDeSaida);
+        temp = NULL;
+    }
+    free(num1);
+    free(num2);
+
+    /*char *teste3;
+    //teste3=(char*)malloc(sizeof(char));
+    printf("Pilha de resultados:\n");
+    while (!pilha_vazia(pilhaDeResultados)) {
+        recupere_da_pilha(pilhaDeResultados, (ElementoDePilha *)&teste3);
+        printf("'%s'\n", teste3);
+        remova_elemento_da_pilha(&pilhaDeResultados);
+        teste3 = NULL;
+    }
+    //free(teste3);*/
+
+
+    /*free_fila(&filaDeSaida);
+    free_pilha(&pilhaDeResultados);*/
 
 
     return 0;
