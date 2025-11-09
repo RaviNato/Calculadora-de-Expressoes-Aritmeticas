@@ -4,6 +4,6 @@
 #include "basics.h"
 
 unsigned int posicao(char operador);
-
+boolean matriz[7][7];
 
 #endif // FUNCOES
