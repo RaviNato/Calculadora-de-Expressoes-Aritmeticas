@@ -12,8 +12,6 @@ VALIDAÇÕES FEITAS:
     dar erro se houver espaço entre digitos "5 9"
     dar erro se não houver mais elementos na filadesaida mas houver mais de um elemento na pilhaderesultados "expressao mal formada"
     dar erro se houver divisão por zero
-
-VALIDAÇÕES PENDENTES:
     dar erro se começar ou terminar com operador
     dar erro se houver operador antes de ')'
     dar erro se houver operador depois de '('
@@ -67,7 +65,7 @@ Fila definir_expressao_infixa(void){
 
     char expressao[100];
     char tokens[100][20];
-    int contadorToken = 0, espacoentredigitos = 0, divisaoporzero = 0;
+    int contadorToken = 0, espacoentredigitos = 0, divisaoporzero = 0, comecoucomoperador = 0, terminoucomoperador = 0, operadorduplo = 0;
 
     printf("\nDigite a expressao matematica: ");
     fgets(expressao, sizeof(expressao), stdin);
@@ -81,17 +79,17 @@ Fila definir_expressao_infixa(void){
             if (isspace(expressao[i])) {                                        // se for espaço
                 if (espacoentredigitos = 1) espacoentredigitos = 2;
 
-
                 continue;
                 
             } else if (isdigit(expressao[i])) {                                 // se for numero
-
+                if (operadorduplo == 1) operadorduplo = 0;
+                if (terminoucomoperador == 1) terminoucomoperador = 0;
+                if (comecoucomoperador == 0) comecoucomoperador = 1;
                 if (espacoentredigitos == 0) espacoentredigitos = 1;            // se houver numero-espaço-numero, encerra o programa
                 if (espacoentredigitos == 2) {
                     printf("\nEspacos entre digitos. Programa encerrado!\n\n");
                     exit(EXIT_FAILURE);
                 }
-
 
                 int j;
                 for (j = 0; isdigit(expressao[i]); j++){
@@ -110,17 +108,51 @@ Fila definir_expressao_infixa(void){
                 contadorToken++;
                 i--;
 
-
                 if (divisaoporzero == 1) {                                      // se houver divisão por zero, encerra o programa
                     printf("\nDivisao por zero. Programa encerrado!\n\n");
                     exit(EXIT_FAILURE);
                 }
 
+            } else if (expressao[i]=='('){                                      // se for '('
+                comecoucomoperador = 0;
+                terminoucomoperador = 1;
+                operadorduplo = 0;
+
+                tokens[contadorToken][0] = expressao[i];
+                tokens[contadorToken][1] = '\0';
+                guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[contadorToken]);
+                contadorToken++;
+
+            } else if (expressao[i]==')'){                                      // se for ')'
+                if (terminoucomoperador == 1) {
+                    printf("\nExpressao mal formada. Programa encerrado!\n\n");
+                    exit(EXIT_FAILURE);
+                }
+
+                comecoucomoperador = 1;
+                terminoucomoperador = 0;
+                operadorduplo = 0;
+
+                tokens[contadorToken][0] = expressao[i];
+                tokens[contadorToken][1] = '\0';
+                guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[contadorToken]);
+                contadorToken++;
 
             } else {                                                            // se for simbolo
-                espacoentredigitos = 0;
+                if (operadorduplo == 1) {
+                    printf("\nOperadores seguidos. Programa encerrado!\n\n");
+                    exit(EXIT_FAILURE);
+                }
+                if (comecoucomoperador == 0) {
+                    printf("\nExpressao mal formada. Programa encerrado!\n\n");
+                    exit(EXIT_FAILURE);
+                }
                 if (expressao[i]=='/') divisaoporzero = 1;
 
+                espacoentredigitos = 0;
+                terminoucomoperador = 1;
+                operadorduplo = 1;
+                
                 tokens[contadorToken][0] = expressao[i];
                 tokens[contadorToken][1] = '\0';
                 guarde_na_fila (&filaDeEntrada,(ElementoDeFila)tokens[contadorToken]);
@@ -131,6 +163,11 @@ Fila definir_expressao_infixa(void){
             printf("\nCaracteres invalidos. Programa encerrado!\n\n");
             exit(EXIT_FAILURE);                                                 // Encerra o programa direto
         }
+    }
+
+    if (terminoucomoperador == 1) {
+        printf("\nExpressao mal formada. Programa encerrado!\n\n");
+        exit(EXIT_FAILURE);
     }
 
     return filaDeEntrada;
